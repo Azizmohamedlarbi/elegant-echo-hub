@@ -33,10 +33,12 @@ export const createArticle = async (articleData: ArticleData, userId: string) =>
   const { data, error } = await supabase
     .from('articles')
     .insert([{
-      ...articleData,
+      title: articleData.title,
       slug: articleData.slug || generateSlug(articleData.title),
       excerpt: articleData.excerpt.trim() || null,
+      content: articleData.content,
       featured_image_url: articleData.featuredImageUrl.trim() || null,
+      status: articleData.status,
       published_at: articleData.status === 'published' ? new Date().toISOString() : null,
       author_id: userId,
     }])
@@ -51,10 +53,12 @@ export const updateArticle = async (articleId: string, articleData: ArticleData,
   const { error } = await supabase
     .from('articles')
     .update({
-      ...articleData,
+      title: articleData.title,
       slug: articleData.slug || generateSlug(articleData.title),
       excerpt: articleData.excerpt.trim() || null,
+      content: articleData.content,
       featured_image_url: articleData.featuredImageUrl.trim() || null,
+      status: articleData.status,
       published_at: articleData.status === 'published' ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     })

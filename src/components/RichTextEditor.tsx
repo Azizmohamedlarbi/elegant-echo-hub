@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -32,13 +32,14 @@ interface ToolbarButton {
 }
 
 export function RichTextEditor({ value, onChange, placeholder, rows = 15 }: RichTextEditorProps) {
-  const [textareaRef, setTextareaRef] = useState<HTMLTextAreaElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const insertText = (before: string, after: string = '') => {
-    if (!textareaRef) return;
+    if (!textareaRef.current) return;
 
-    const start = textareaRef.selectionStart;
-    const end = textareaRef.selectionEnd;
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
     const selectedText = value.substring(start, end);
     
     const newText = value.substring(0, start) + before + selectedText + after + value.substring(end);
@@ -46,16 +47,17 @@ export function RichTextEditor({ value, onChange, placeholder, rows = 15 }: Rich
     
     // Focus back on textarea and set cursor position
     setTimeout(() => {
-      textareaRef.focus();
+      textarea.focus();
       const newCursorPos = start + before.length + selectedText.length + after.length;
-      textareaRef.setSelectionRange(newCursorPos, newCursorPos);
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
   };
 
   const insertAtNewLine = (text: string) => {
-    if (!textareaRef) return;
+    if (!textareaRef.current) return;
 
-    const start = textareaRef.selectionStart;
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
     const beforeCursor = value.substring(0, start);
     const afterCursor = value.substring(start);
     
@@ -67,14 +69,15 @@ export function RichTextEditor({ value, onChange, placeholder, rows = 15 }: Rich
     onChange(newText);
     
     setTimeout(() => {
-      textareaRef.focus();
+      textarea.focus();
       const newCursorPos = start + prefix.length + text.length;
-      textareaRef.setSelectionRange(newCursorPos, newCursorPos);
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
   };
 
-  const handleButtonClick = (action: () => void) => {
-    // Prevent any form submission
+  const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
+    e.preventDefault();
+    e.stopPropagation();
     action();
   };
 
@@ -156,11 +159,7 @@ export function RichTextEditor({ value, onChange, placeholder, rows = 15 }: Rich
               type="button"
               variant="ghost"
               size="sm"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleButtonClick(button.action);
-              }}
+              onClick={(e) => handleButtonClick(e, button.action)}
               title={button.tooltip}
               className="h-8 w-8 p-0"
             >
@@ -172,14 +171,14 @@ export function RichTextEditor({ value, onChange, placeholder, rows = 15 }: Rich
       
       {/* Text Area */}
       <Textarea
-        ref={setTextareaRef}
+        ref={textareaRef}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
         className="border-0 focus-visible:ring-0 resize-none"
         onKeyDown={(e) => {
-          // Prevent Enter from submitting form
+          // Prevent form submission on Enter
           if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
             e.preventDefault();
             e.stopPropagation();
@@ -192,7 +191,7 @@ export function RichTextEditor({ value, onChange, placeholder, rows = 15 }: Rich
         <p><strong>Formatting Tips:</strong></p>
         <p>• Use **bold** or *italic* for emphasis</p>
         <p>• Start lines with # for headings (# H1, ## H2, ### H3)</p>
-        <p>• Paste YouTube, Instagram, or image URLs directly - they'll be embedded automatically</p>
+        <p>• Paste YouTube, Instagram, Google Drive, or image URLs directly - they'll be embedded automatically</p>
       </div>
     </div>
   );
