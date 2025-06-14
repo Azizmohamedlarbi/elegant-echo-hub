@@ -61,14 +61,17 @@ export function ArticleMetadata({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="featured-image">Featured Image URL</Label>
+        <Label htmlFor="featured-media">Featured Media URL</Label>
         <Input
-          id="featured-image"
+          id="featured-media"
           value={featuredImageUrl}
           onChange={(e) => onFeaturedImageUrlChange(e.target.value)}
-          placeholder="https://example.com/image.jpg"
+          placeholder="YouTube, Google Drive, or direct image URL (https://example.com/image.jpg)"
           type="url"
         />
+        <p className="text-xs text-gray-500 mt-1">
+          ✨ Supports: YouTube videos, Google Drive videos/images, direct image URLs - all display natively!
+        </p>
       </div>
     </>
   );

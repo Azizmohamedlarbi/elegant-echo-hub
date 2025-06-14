@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Edit, Trash2, Eye, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,7 @@ import {
 interface Article {
   id: string;
   title: string;
+  slug: string;
   status: 'draft' | 'published' | 'archived';
   author_id: string;
   created_at: string;
@@ -44,6 +46,7 @@ export const ArticleManagement = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchArticles();
@@ -56,6 +59,7 @@ export const ArticleManagement = () => {
         .select(`
           id,
           title,
+          slug,
           status,
           author_id,
           created_at,
@@ -140,6 +144,14 @@ export const ArticleManagement = () => {
     }
   };
 
+  const handleViewArticle = (slug: string) => {
+    navigate(`/articles/${slug}`);
+  };
+
+  const handleEditArticle = (articleId: string) => {
+    navigate(`/write/${articleId}`);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'published':
@@ -212,11 +224,11 @@ export const ArticleManagement = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleViewArticle(article.slug)}>
                           <Eye className="mr-2 h-4 w-4" />
                           View
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEditArticle(article.id)}>
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>

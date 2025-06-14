@@ -26,23 +26,22 @@ interface ArticleContentProps {
 }
 
 export function ArticleContent({ article, onLike }: ArticleContentProps) {
+  const renderFeaturedMedia = () => {
+    if (!article.featured_image_url) return null;
+
+    // Process the featured media URL through our media processor
+    const processedMedia = processMediaContent(article.featured_image_url);
+    
+    return (
+      <div 
+        className="mb-6"
+        dangerouslySetInnerHTML={{ __html: processedMedia }}
+      />
+    );
+  };
+
   return (
     <Card className="shadow-lg">
-      {article.featured_image_url && (
-        <div className="aspect-video bg-gray-200 rounded-t-lg overflow-hidden">
-          <img
-            src={article.featured_image_url}
-            alt={article.title}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
-          />
-        </div>
-      )}
-      
       <CardHeader>
         <CardTitle className="text-3xl font-bold mb-4">{article.title}</CardTitle>
         
@@ -60,6 +59,8 @@ export function ArticleContent({ article, onLike }: ArticleContentProps) {
       </CardHeader>
       
       <CardContent>
+        {renderFeaturedMedia()}
+        
         <div 
           className="prose prose-lg max-w-none"
           dangerouslySetInnerHTML={{ 
