@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { Navbar } from "@/components/Navbar";
 import Home from "./pages/Home";
 import Articles from "./pages/Articles";
+import Article from "./pages/Article";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Write from "./pages/Write";
@@ -28,6 +29,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/articles" element={<Articles />} />
+                <Route path="/articles/:slug" element={<Article />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/write" element={<Write />} />
