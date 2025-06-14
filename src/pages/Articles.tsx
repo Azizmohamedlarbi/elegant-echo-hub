@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Calendar, User, Heart } from 'lucide-react';
 import { format } from 'date-fns';
+import { extractThumbnail } from '@/utils/thumbnailExtractor';
 
 interface Article {
   id: string;
@@ -124,50 +124,59 @@ export default function Articles() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredArticles.map((article) => (
-              <Card key={article.id} className="hover:shadow-lg transition-shadow group">
-                {article.featured_image_url && (
-                  <div className="aspect-video bg-gray-200 rounded-t-lg overflow-hidden">
-                    <img
-                      src={article.featured_image_url}
-                      alt={article.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle className="line-clamp-2">
-                    <Link
-                      to={`/articles/${article.slug}`}
-                      className="hover:text-blue-600 transition-colors"
-                    >
-                      {article.title}
-                    </Link>
-                  </CardTitle>
-                  <CardDescription className="line-clamp-3">
-                    {article.excerpt}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-1">
-                        <User className="h-4 w-4" />
-                        <span>{article.profiles?.full_name || article.profiles?.username}</span>
+            {filteredArticles.map((article) => {
+              const thumbnailUrl = extractThumbnail(article.featured_image_url);
+              
+              return (
+                <Card key={article.id} className="hover:shadow-lg transition-shadow group">
+                  {thumbnailUrl && (
+                    <div className="aspect-video bg-gray-200 rounded-t-lg overflow-hidden">
+                      <img
+                        src={thumbnailUrl}
+                        alt={article.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  <CardHeader>
+                    <CardTitle className="line-clamp-2">
+                      <Link
+                        to={`/articles/${article.slug}`}
+                        className="hover:text-blue-600 transition-colors"
+                      >
+                        {article.title}
+                      </Link>
+                    </CardTitle>
+                    <CardDescription className="line-clamp-3">
+                      {article.excerpt}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-1">
+                          <User className="h-4 w-4" />
+                          <span>{article.profiles?.full_name || article.profiles?.username}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Calendar className="h-4 w-4" />
+                          <span>{format(new Date(article.published_at), 'MMM d, yyyy')}</span>
+                        </div>
                       </div>
                       <div className="flex items-center space-x-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>{format(new Date(article.published_at), 'MMM d, yyyy')}</span>
+                        <Heart className="h-4 w-4" />
+                        <span>{article._count.likes}</span>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <Heart className="h-4 w-4" />
-                      <span>{article._count.likes}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
