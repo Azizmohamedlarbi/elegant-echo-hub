@@ -73,6 +73,11 @@ export function RichTextEditor({ value, onChange, placeholder, rows = 15 }: Rich
     }, 0);
   };
 
+  const handleButtonClick = (action: () => void) => {
+    // Prevent any form submission
+    action();
+  };
+
   const toolbarButtons: (ToolbarButton | 'separator')[] = [
     {
       icon: <Bold className="h-4 w-4" />,
@@ -148,9 +153,14 @@ export function RichTextEditor({ value, onChange, placeholder, rows = 15 }: Rich
           ) : (
             <Button
               key={index}
+              type="button"
               variant="ghost"
               size="sm"
-              onClick={button.action}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleButtonClick(button.action);
+              }}
               title={button.tooltip}
               className="h-8 w-8 p-0"
             >
@@ -168,6 +178,13 @@ export function RichTextEditor({ value, onChange, placeholder, rows = 15 }: Rich
         placeholder={placeholder}
         rows={rows}
         className="border-0 focus-visible:ring-0 resize-none"
+        onKeyDown={(e) => {
+          // Prevent Enter from submitting form
+          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }}
       />
       
       {/* Help Text */}
