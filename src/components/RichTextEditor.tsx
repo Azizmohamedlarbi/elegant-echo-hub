@@ -25,6 +25,12 @@ interface RichTextEditorProps {
   rows?: number;
 }
 
+interface ToolbarButton {
+  icon: JSX.Element;
+  tooltip: string;
+  action: () => void;
+}
+
 export function RichTextEditor({ value, onChange, placeholder, rows = 15 }: RichTextEditorProps) {
   const [textareaRef, setTextareaRef] = useState<HTMLTextAreaElement | null>(null);
 
@@ -67,7 +73,7 @@ export function RichTextEditor({ value, onChange, placeholder, rows = 15 }: Rich
     }, 0);
   };
 
-  const toolbarButtons = [
+  const toolbarButtons: (ToolbarButton | 'separator')[] = [
     {
       icon: <Bold className="h-4 w-4" />,
       tooltip: 'Bold',
