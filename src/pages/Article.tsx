@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { CommentSection } from '@/components/CommentSection';
+import { processMediaContent, loadInstagramScript } from '@/utils/mediaProcessor';
 
 interface Article {
   id: string;
@@ -39,6 +40,11 @@ export default function Article() {
       fetchArticle();
     }
   }, [slug, user]);
+
+  // Load Instagram script when component mounts
+  useEffect(() => {
+    loadInstagramScript();
+  }, []);
 
   const fetchArticle = async () => {
     try {
@@ -139,49 +145,6 @@ export default function Article() {
     }
   };
 
-  const processContent = (content: string) => {
-    // Replace media URLs with embedded content
-    let processedContent = content;
-
-    // YouTube video embedding
-    processedContent = processedContent.replace(
-      /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/g,
-      '<div class="video-container my-6"><iframe width="100%" height="315" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>'
-    );
-
-    // Google Drive video embedding
-    processedContent = processedContent.replace(
-      /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view/g,
-      '<div class="video-container my-6"><iframe width="100%" height="315" src="https://drive.google.com/file/d/$1/preview" frameborder="0" allowfullscreen></iframe></div>'
-    );
-
-    // Instagram post embedding
-    processedContent = processedContent.replace(
-      /https:\/\/(?:www\.)?instagram\.com\/(?:p|reel)\/([a-zA-Z0-9_-]+)/g,
-      '<div class="instagram-container my-6"><blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/$1/" style="max-width:540px; margin:auto;"></blockquote></div>'
-    );
-
-    // Facebook video embedding
-    processedContent = processedContent.replace(
-      /https:\/\/(?:www\.)?facebook\.com\/.*\/videos\/([0-9]+)/g,
-      '<div class="video-container my-6"><iframe width="100%" height="315" src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/facebook/videos/$1" frameborder="0" allowfullscreen></iframe></div>'
-    );
-
-    // Image embedding (for various sources including Google Drive images)
-    processedContent = processedContent.replace(
-      /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp))/gi,
-      '<img src="$1" alt="Article image" class="w-full h-auto rounded-lg my-4" />'
-    );
-
-    // Google Drive image embedding
-    processedContent = processedContent.replace(
-      /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view/g,
-      '<img src="https://drive.google.com/uc?id=$1" alt="Article image" class="w-full h-auto rounded-lg my-4" />'
-    );
-
-    return processedContent;
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -226,6 +189,11 @@ export default function Article() {
                 src={article.featured_image_url}
                 alt={article.title}
                 className="w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
               />
             </div>
           )}
@@ -265,7 +233,7 @@ export default function Article() {
             <div 
               className="prose prose-lg max-w-none"
               dangerouslySetInnerHTML={{ 
-                __html: processContent(article.content.replace(/\n/g, '<br />')) 
+                __html: processMediaContent(article.content.replace(/\n/g, '<br />')) 
               }}
             />
           </CardContent>
@@ -274,9 +242,6 @@ export default function Article() {
         {/* Comment Section */}
         <CommentSection articleId={article.id} />
       </div>
-
-      {/* Instagram embed script */}
-      <script async src="//www.instagram.com/embed.js"></script>
     </div>
   );
 }

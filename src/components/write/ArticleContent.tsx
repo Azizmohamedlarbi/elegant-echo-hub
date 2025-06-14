@@ -16,23 +16,25 @@ export function ArticleContent({ content, onContentChange }: ArticleContentProps
         <div className="flex items-start space-x-2">
           <Info className="h-5 w-5 text-blue-600 mt-0.5" />
           <div className="text-sm text-blue-800">
-            <p className="font-medium mb-2">Rich Text Editor & Media Embedding:</p>
+            <p className="font-medium mb-2">Éditeur de texte enrichi et intégration de médias :</p>
             <ul className="space-y-1 list-disc list-inside">
-              <li>Use the toolbar above to format your text with headings, bold, italic, lists, and more</li>
-              <li><strong>YouTube:</strong> Paste YouTube video URLs directly (youtube.com/watch?v= or youtu.be/)</li>
-              <li><strong>Google Drive:</strong> Share videos/images and paste the sharing link</li>
-              <li><strong>Instagram:</strong> Paste Instagram post URLs (instagram.com/p/ or /reel/)</li>
-              <li><strong>Facebook:</strong> Paste Facebook video URLs</li>
-              <li><strong>Images:</strong> Paste direct image URLs (.jpg, .png, .gif, etc.)</li>
+              <li>Utilisez la barre d'outils pour formater votre texte avec des titres, gras, italique, listes, etc.</li>
+              <li><strong>YouTube :</strong> Collez directement les URLs YouTube (youtube.com/watch?v= ou youtu.be/)</li>
+              <li><strong>Google Drive :</strong> Partagez vos vidéos/images et collez le lien de partage</li>
+              <li><strong>Instagram :</strong> Collez les URLs de posts Instagram (instagram.com/p/ ou /reel/)</li>
+              <li><strong>Facebook :</strong> Collez les URLs de vidéos Facebook</li>
+              <li><strong>Vimeo :</strong> Collez les URLs Vimeo pour les vidéos</li>
+              <li><strong>Images :</strong> Collez les URLs directes d'images (.jpg, .png, .gif, etc.)</li>
             </ul>
-            <p className="mt-2 text-xs">All media will be embedded natively in your blog without showing the source.</p>
+            <p className="mt-2 text-xs">Tous les médias seront intégrés nativement dans votre blog sans montrer la source.</p>
+            <p className="mt-1 text-xs font-medium text-blue-900">✨ Améliorations : Meilleure gestion des erreurs, chargement optimisé, et support étendu des formats.</p>
           </div>
         </div>
       </div>
       <RichTextEditor
         value={content}
         onChange={onContentChange}
-        placeholder="Write your article content here... Use the toolbar above to format your text and paste media URLs directly for automatic embedding."
+        placeholder="Écrivez le contenu de votre article ici... Utilisez la barre d'outils ci-dessus pour formater votre texte et collez directement les URLs de médias pour un intégration automatique."
         rows={15}
       />
     </div>
