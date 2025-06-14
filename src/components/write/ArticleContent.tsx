@@ -24,7 +24,7 @@ export function ArticleContent({ content, onContentChange }: ArticleContentProps
               <li><strong>Instagram :</strong> Collez les URLs de posts Instagram - affichage natif</li>
               <li><strong>Images :</strong> Collez les URLs directes d'images - affichage optimisé</li>
               <li><strong>Listes :</strong> Utilisez - pour puces ou 1. pour numérotées</li>
-              <li><strong>Citations :</strong> Commencez par > pour des citations stylées</li>
+              <li><strong>Citations :</strong> Commencez par {'>'}  pour des citations stylées</li>
             </ul>
             <p className="mt-2 text-xs font-medium text-green-700">✨ Tous les médias sont intégrés nativement sans montrer les liens sources !</p>
           </div>
