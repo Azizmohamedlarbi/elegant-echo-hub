@@ -1,4 +1,3 @@
-
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +7,7 @@ import { Navigate } from 'react-router-dom';
 import { ArticleManagement } from '@/components/admin/ArticleManagement';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { DashboardStats } from '@/components/admin/DashboardStats';
+import { AnalyticsOverview } from '@/components/admin/AnalyticsOverview';
 import { Loader2 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -104,15 +104,7 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="analytics">
-            <Card>
-              <CardHeader>
-                <CardTitle>Analytics</CardTitle>
-                <CardDescription>Blog performance metrics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Analytics features coming soon...</p>
-              </CardContent>
-            </Card>
+            <AnalyticsOverview />
           </TabsContent>
         </Tabs>
       </div>

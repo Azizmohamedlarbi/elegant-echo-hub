@@ -1,16 +1,15 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Loader2, Info } from 'lucide-react';
+import { RichTextEditor } from '@/components/RichTextEditor';
 
 export default function Write() {
   const { user, loading: authLoading } = useAuth();
@@ -168,8 +167,9 @@ export default function Write() {
                   <div className="flex items-start space-x-2">
                     <Info className="h-5 w-5 text-blue-600 mt-0.5" />
                     <div className="text-sm text-blue-800">
-                      <p className="font-medium mb-2">Media Embedding Tips:</p>
+                      <p className="font-medium mb-2">Rich Text Editor & Media Embedding:</p>
                       <ul className="space-y-1 list-disc list-inside">
+                        <li>Use the toolbar above to format your text with headings, bold, italic, lists, and more</li>
                         <li><strong>YouTube:</strong> Paste YouTube video URLs directly (youtube.com/watch?v= or youtu.be/)</li>
                         <li><strong>Google Drive:</strong> Share videos/images and paste the sharing link</li>
                         <li><strong>Instagram:</strong> Paste Instagram post URLs (instagram.com/p/ or /reel/)</li>
@@ -180,13 +180,11 @@ export default function Write() {
                     </div>
                   </div>
                 </div>
-                <Textarea
-                  id="content"
+                <RichTextEditor
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Write your article content here... You can paste media URLs directly and they will be embedded automatically when viewed."
+                  onChange={setContent}
+                  placeholder="Write your article content here... Use the toolbar above to format your text and paste media URLs directly for automatic embedding."
                   rows={15}
-                  required
                 />
               </div>
 

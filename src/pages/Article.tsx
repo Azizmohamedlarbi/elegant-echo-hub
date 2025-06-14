@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +8,7 @@ import { Calendar, User, Heart, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { CommentSection } from '@/components/CommentSection';
 
 interface Article {
   id: string;
@@ -209,7 +209,7 @@ export default function Article() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="mb-6">
           <Link to="/articles">
             <Button variant="outline" size="sm">
@@ -270,6 +270,9 @@ export default function Article() {
             />
           </CardContent>
         </Card>
+
+        {/* Comment Section */}
+        <CommentSection articleId={article.id} />
       </div>
 
       {/* Instagram embed script */}
