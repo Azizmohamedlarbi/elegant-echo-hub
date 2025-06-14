@@ -9,6 +9,7 @@ import { Navbar } from "@/components/Navbar";
 import Home from "./pages/Home";
 import Articles from "./pages/Articles";
 import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/articles" element={<Articles />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
