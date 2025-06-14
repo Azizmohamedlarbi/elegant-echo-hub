@@ -20,7 +20,7 @@ export function ArticleForm({ articleId }: ArticleFormProps) {
   const [excerpt, setExcerpt] = useState('');
   const [content, setContent] = useState('');
   const [featuredImageUrl, setFeaturedImageUrl] = useState('');
-  const [status, setStatus] = useState<'draft' | 'published'>('draft');
+  const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('draft');
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(!!articleId);
   const { toast } = useToast();

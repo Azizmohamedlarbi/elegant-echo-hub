@@ -5,9 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2 } from 'lucide-react';
 
 interface ArticleActionsProps {
-  status: 'draft' | 'published';
+  status: 'draft' | 'published' | 'archived';
   loading: boolean;
-  onStatusChange: (value: 'draft' | 'published') => void;
+  onStatusChange: (value: 'draft' | 'published' | 'archived') => void;
   onCancel: () => void;
 }
 
@@ -28,6 +28,7 @@ export function ArticleActions({
           <SelectContent>
             <SelectItem value="draft">Save as Draft</SelectItem>
             <SelectItem value="published">Publish Now</SelectItem>
+            <SelectItem value="archived">Archive Article</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -35,7 +36,7 @@ export function ArticleActions({
       <div className="flex gap-4 pt-4">
         <Button type="submit" disabled={loading}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {status === 'published' ? 'Publish Article' : 'Save Draft'}
+          {status === 'published' ? 'Publish Article' : status === 'archived' ? 'Archive Article' : 'Save Draft'}
         </Button>
         <Button
           type="button"
