@@ -27,7 +27,7 @@ interface ArticleContentProps {
 
 export function ArticleContent({ article, onLike }: ArticleContentProps) {
   return (
-    <Card>
+    <Card className="shadow-lg">
       {article.featured_image_url && (
         <div className="aspect-video bg-gray-200 rounded-t-lg overflow-hidden">
           <img
@@ -63,7 +63,7 @@ export function ArticleContent({ article, onLike }: ArticleContentProps) {
         <div 
           className="prose prose-lg max-w-none"
           dangerouslySetInnerHTML={{ 
-            __html: processMediaContent(article.content.replace(/\n/g, '<br />')) 
+            __html: processMediaContent(article.content) 
           }}
         />
       </CardContent>
