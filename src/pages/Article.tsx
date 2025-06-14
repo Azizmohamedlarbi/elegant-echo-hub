@@ -1,15 +1,15 @@
+
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Calendar, User, Heart, ArrowLeft } from 'lucide-react';
-import { format } from 'date-fns';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { CommentSection } from '@/components/CommentSection';
-import { processMediaContent, loadInstagramScript } from '@/utils/mediaProcessor';
+import { loadInstagramScript } from '@/utils/mediaProcessor';
+import { ArticleHeader } from '@/components/article/ArticleHeader';
+import { ArticleLoading } from '@/components/article/ArticleLoading';
+import { ArticleNotFound } from '@/components/article/ArticleNotFound';
+import { ArticleContent } from '@/components/article/ArticleContent';
 
 interface Article {
   id: string;
@@ -146,100 +146,18 @@ export default function Article() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading article...</div>
-      </div>
-    );
+    return <ArticleLoading />;
   }
 
   if (!article) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Article Not Found</h1>
-          <p className="text-gray-600 mb-6">The article you're looking for doesn't exist or has been removed.</p>
-          <Link to="/articles">
-            <Button>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Articles
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
+    return <ArticleNotFound />;
   }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="mb-6">
-          <Link to="/articles">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Articles
-            </Button>
-          </Link>
-        </div>
-
-        <Card>
-          {article.featured_image_url && (
-            <div className="aspect-video bg-gray-200 rounded-t-lg overflow-hidden">
-              <img
-                src={article.featured_image_url}
-                alt={article.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                }}
-              />
-            </div>
-          )}
-          
-          <CardHeader>
-            <CardTitle className="text-3xl font-bold mb-4">{article.title}</CardTitle>
-            
-            {article.excerpt && (
-              <p className="text-lg text-gray-600 mb-4">{article.excerpt}</p>
-            )}
-            
-            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-1">
-                  <User className="h-4 w-4" />
-                  <span>{article.profiles?.full_name || article.profiles?.username}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>{format(new Date(article.published_at), 'MMMM d, yyyy')}</span>
-                </div>
-              </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLike}
-                className={article.isLiked ? 'text-red-500 hover:text-red-600' : ''}
-              >
-                <Heart className={`h-4 w-4 mr-1 ${article.isLiked ? 'fill-current' : ''}`} />
-                {article._count.likes}
-              </Button>
-            </div>
-          </CardHeader>
-          
-          <CardContent>
-            <div 
-              className="prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ 
-                __html: processMediaContent(article.content.replace(/\n/g, '<br />')) 
-              }}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Comment Section */}
+        <ArticleHeader />
+        <ArticleContent article={article} onLike={handleLike} />
         <CommentSection articleId={article.id} />
       </div>
     </div>
