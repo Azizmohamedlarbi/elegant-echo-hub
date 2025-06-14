@@ -1,96 +1,55 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { useArticleFormState } from './useArticleFormState';
+import { loadArticle, createArticle, updateArticle } from '@/services/articleService';
+import { validateArticleForm } from '@/utils/articleUtils';
 
 export function useArticleForm(articleId?: string) {
   const { user } = useAuth();
-  const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
-  const [excerpt, setExcerpt] = useState('');
-  const [content, setContent] = useState('');
-  const [featuredImageUrl, setFeaturedImageUrl] = useState('');
-  const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('draft');
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(!!articleId);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const formState = useArticleFormState();
 
-  // Load existing article data if in edit mode
+  // Set initial loading state if in edit mode
   useEffect(() => {
     if (articleId) {
-      loadArticle();
+      formState.setInitialLoading(true);
+      loadArticleData();
     }
   }, [articleId]);
 
-  const loadArticle = async () => {
+  const loadArticleData = async () => {
     if (!articleId || !user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('articles')
-        .select('*')
-        .eq('id', articleId)
-        .eq('author_id', user.id)
-        .single();
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          toast({
-            title: 'Article not found',
-            description: 'The article you are trying to edit does not exist or you do not have permission to edit it.',
-            variant: 'destructive',
-          });
-          navigate('/dashboard');
-          return;
-        }
-        throw error;
-      }
-
-      // Populate form with existing data
-      setTitle(data.title);
-      setSlug(data.slug);
-      setExcerpt(data.excerpt || '');
-      setContent(data.content);
-      setFeaturedImageUrl(data.featured_image_url || '');
-      setStatus(data.status);
+      const data = await loadArticle(articleId, user.id);
+      formState.populateForm(data);
     } catch (error) {
       console.error('Error loading article:', error);
       toast({
         title: 'Error',
-        description: 'Failed to load article data',
+        description: error instanceof Error ? error.message : 'Failed to load article data',
         variant: 'destructive',
       });
       navigate('/dashboard');
     } finally {
-      setInitialLoading(false);
-    }
-  };
-
-  const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
-  };
-
-  const handleTitleChange = (value: string) => {
-    setTitle(value);
-    // Only auto-generate slug for new articles or if slug matches the old title
-    if (!articleId || slug === generateSlug(title)) {
-      setSlug(generateSlug(value));
+      formState.setInitialLoading(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!title.trim() || !content.trim()) {
+    const formData = formState.getFormData();
+    const validationError = validateArticleForm(formData.title, formData.content);
+    
+    if (validationError) {
       toast({
         title: 'Error',
-        description: 'Title and content are required',
+        description: validationError,
         variant: 'destructive',
       });
       return;
@@ -105,52 +64,20 @@ export function useArticleForm(articleId?: string) {
       return;
     }
 
-    setLoading(true);
+    formState.setLoading(true);
 
     try {
-      const articleData = {
-        title: title.trim(),
-        slug: slug || generateSlug(title),
-        excerpt: excerpt.trim() || null,
-        content: content.trim(),
-        featured_image_url: featuredImageUrl.trim() || null,
-        status,
-        published_at: status === 'published' ? new Date().toISOString() : null,
-      };
-
       if (articleId) {
-        // Update existing article
-        const { error } = await supabase
-          .from('articles')
-          .update({
-            ...articleData,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', articleId)
-          .eq('author_id', user.id);
-
-        if (error) throw error;
-
+        await updateArticle(articleId, formData, user.id);
         toast({
           title: 'Success',
-          description: `Article ${status === 'published' ? 'updated and published' : 'updated'} successfully`,
+          description: `Article ${formData.status === 'published' ? 'updated and published' : 'updated'} successfully`,
         });
       } else {
-        // Create new article
-        const { data, error } = await supabase
-          .from('articles')
-          .insert([{
-            ...articleData,
-            author_id: user.id,
-          }])
-          .select()
-          .single();
-
-        if (error) throw error;
-
+        await createArticle(formData, user.id);
         toast({
           title: 'Success',
-          description: `Article ${status === 'published' ? 'published' : 'saved as draft'} successfully`,
+          description: `Article ${formData.status === 'published' ? 'published' : 'saved as draft'} successfully`,
         });
       }
 
@@ -163,27 +90,27 @@ export function useArticleForm(articleId?: string) {
         variant: 'destructive',
       });
     } finally {
-      setLoading(false);
+      formState.setLoading(false);
     }
   };
 
   return {
-    // State
-    title,
-    slug,
-    excerpt,
-    content,
-    featuredImageUrl,
-    status,
-    loading,
-    initialLoading,
+    // State from formState
+    title: formState.title,
+    slug: formState.slug,
+    excerpt: formState.excerpt,
+    content: formState.content,
+    featuredImageUrl: formState.featuredImageUrl,
+    status: formState.status,
+    loading: formState.loading,
+    initialLoading: formState.initialLoading,
     // Handlers
-    handleTitleChange,
-    setSlug,
-    setExcerpt,
-    setContent,
-    setFeaturedImageUrl,
-    setStatus,
+    handleTitleChange: (value: string) => formState.handleTitleChange(value, articleId),
+    setSlug: formState.setSlug,
+    setExcerpt: formState.setExcerpt,
+    setContent: formState.setContent,
+    setFeaturedImageUrl: formState.setFeaturedImageUrl,
+    setStatus: formState.setStatus,
     handleSubmit,
     handleCancel: () => navigate('/dashboard'),
   };
