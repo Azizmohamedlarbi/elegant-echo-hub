@@ -8,10 +8,16 @@ export const extractThumbnail = (mediaUrl: string): string | null => {
     return `https://img.youtube.com/vi/${youtubeMatch[1]}/maxresdefault.jpg`;
   }
 
-  // Google Drive image thumbnail
-  const driveMatch = mediaUrl.match(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view/);
+  // Google Drive image thumbnail - more flexible pattern matching
+  const driveMatch = mediaUrl.match(/https:\/\/drive\.google\.com\/(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]+)(?:\/view)?(?:\?[^&]*)?(?:&[^&]*)*(?:#.*)?$/);
   if (driveMatch) {
     return `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`;
+  }
+
+  // Alternative Google Drive pattern (direct share links)
+  const driveDirectMatch = mediaUrl.match(/https:\/\/drive\.google\.com\/uc\?(?:.*&)?id=([a-zA-Z0-9_-]+)(?:&.*)?$/);
+  if (driveDirectMatch) {
+    return `https://drive.google.com/uc?export=view&id=${driveDirectMatch[1]}`;
   }
 
   // Direct image URLs - return as is
