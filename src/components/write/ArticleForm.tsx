@@ -14,6 +14,8 @@ export function ArticleForm({ articleId }: ArticleFormProps) {
     excerpt,
     content,
     featuredImageUrl,
+    categoryIds,
+    tags,
     status,
     loading,
     initialLoading,
@@ -22,6 +24,8 @@ export function ArticleForm({ articleId }: ArticleFormProps) {
     setExcerpt,
     setContent,
     setFeaturedImageUrl,
+    setCategoryIds,
+    setTags,
     setStatus,
     handleSubmit,
     handleCancel,
@@ -39,6 +43,8 @@ export function ArticleForm({ articleId }: ArticleFormProps) {
       excerpt={excerpt}
       content={content}
       featuredImageUrl={featuredImageUrl}
+      categoryIds={categoryIds}
+      tags={tags}
       status={status}
       loading={loading}
       onTitleChange={handleTitleChange}
@@ -46,6 +52,8 @@ export function ArticleForm({ articleId }: ArticleFormProps) {
       onExcerptChange={setExcerpt}
       onContentChange={setContent}
       onFeaturedImageUrlChange={setFeaturedImageUrl}
+      onCategoryIdsChange={setCategoryIds}
+      onTagsChange={setTags}
       onStatusChange={setStatus}
       onSubmit={handleSubmit}
       onCancel={handleCancel}

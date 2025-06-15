@@ -1,10 +1,13 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Calendar, User, Heart } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Search, Calendar, User, Heart, Filter, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { extractThumbnail } from '@/utils/thumbnailExtractor';
 
@@ -19,36 +22,52 @@ interface Article {
     full_name: string;
     username: string;
   };
+  categories: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    color: string;
+  }>;
+  tags: Array<{
+    id: string;
+    name: string;
+    slug: string;
+  }>;
   _count: {
     likes: number;
   };
 }
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  color: string;
+}
+
 export default function Articles() {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedTag, setSelectedTag] = useState<string>('');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest');
   const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchArticles();
+    fetchArticlesAndCategories();
   }, []);
 
   useEffect(() => {
-    if (searchTerm) {
-      const filtered = articles.filter(article =>
-        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.excerpt?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredArticles(filtered);
-    } else {
-      setFilteredArticles(articles);
-    }
-  }, [searchTerm, articles]);
+    filterAndSortArticles();
+  }, [articles, searchTerm, selectedCategory, selectedTag, sortBy]);
 
-  const fetchArticles = async () => {
+  const fetchArticlesAndCategories = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch articles with categories and tags
+      const { data: articlesData, error: articlesError } = await supabase
         .from('articles')
         .select(`
           id,
@@ -60,16 +79,39 @@ export default function Articles() {
           profiles (
             full_name,
             username
+          ),
+          article_categories (
+            categories (
+              id,
+              name,
+              slug,
+              color
+            )
+          ),
+          article_tags (
+            tags (
+              id,
+              name,
+              slug
+            )
           )
         `)
         .eq('status', 'published')
         .order('published_at', { ascending: false });
 
-      if (error) throw error;
+      if (articlesError) throw articlesError;
 
-      // Get likes count for each article
-      const articlesWithLikes = await Promise.all(
-        (data || []).map(async (article) => {
+      // Fetch categories
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
+
+      if (categoriesError) throw categoriesError;
+
+      // Transform articles data
+      const transformedArticles = await Promise.all(
+        (articlesData || []).map(async (article) => {
           const { count } = await supabase
             .from('likes')
             .select('*', { count: 'exact', head: true })
@@ -77,18 +119,80 @@ export default function Articles() {
 
           return {
             ...article,
+            categories: article.article_categories?.map(ac => ac.categories).filter(Boolean) || [],
+            tags: article.article_tags?.map(at => at.tags).filter(Boolean) || [],
             _count: { likes: count || 0 }
           };
         })
       );
 
-      setArticles(articlesWithLikes);
+      setArticles(transformedArticles);
+      setCategories(categoriesData || []);
+
+      // Extract unique tags
+      const allTags = transformedArticles.flatMap(article => 
+        article.tags.map(tag => tag.name)
+      );
+      setAvailableTags([...new Set(allTags)].sort());
+
     } catch (error) {
-      console.error('Error fetching articles:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  const filterAndSortArticles = () => {
+    let filtered = [...articles];
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(article =>
+        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        article.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        article.categories.some(cat => cat.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        article.tags.some(tag => tag.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    // Filter by category
+    if (selectedCategory) {
+      filtered = filtered.filter(article =>
+        article.categories.some(cat => cat.id === selectedCategory)
+      );
+    }
+
+    // Filter by tag
+    if (selectedTag) {
+      filtered = filtered.filter(article =>
+        article.tags.some(tag => tag.name === selectedTag)
+      );
+    }
+
+    // Sort articles
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'oldest':
+          return new Date(a.published_at).getTime() - new Date(b.published_at).getTime();
+        case 'popular':
+          return b._count.likes - a._count.likes;
+        case 'newest':
+        default:
+          return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+      }
+    });
+
+    setFilteredArticles(filtered);
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory('');
+    setSelectedTag('');
+    setSortBy('newest');
+  };
+
+  const hasActiveFilters = searchTerm || selectedCategory || selectedTag || sortBy !== 'newest';
 
   if (loading) {
     return (
@@ -102,82 +206,172 @@ export default function Articles() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">All Articles</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">All Articles</h1>
           
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Search articles..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          {/* Search and Filters */}
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Search articles, categories, or tags..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-4 items-center">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <span className="text-sm text-gray-600">Filters:</span>
+              </div>
+
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={selectedTag} onValueChange={setSelectedTag}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="All Tags" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Tags</SelectItem>
+                  {availableTags.map((tag) => (
+                    <SelectItem key={tag} value={tag}>
+                      {tag}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={sortBy} onValueChange={(value: 'newest' | 'oldest' | 'popular') => setSortBy(value)}>
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Newest First</SelectItem>
+                  <SelectItem value="oldest">Oldest First</SelectItem>
+                  <SelectItem value="popular">Most Popular</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {hasActiveFilters && (
+                <Button variant="outline" size="sm" onClick={clearFilters}>
+                  <X className="h-4 w-4 mr-1" />
+                  Clear Filters
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
         {filteredArticles.length === 0 ? (
           <div className="text-center text-gray-600 py-12">
             <p className="text-lg">
-              {searchTerm ? 'No articles found matching your search.' : 'No articles published yet.'}
+              {hasActiveFilters ? 'No articles found matching your criteria.' : 'No articles published yet.'}
             </p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredArticles.map((article) => {
-              const thumbnailUrl = extractThumbnail(article.featured_image_url);
-              
-              return (
-                <Card key={article.id} className="hover:shadow-lg transition-shadow group">
-                  {thumbnailUrl && (
-                    <div className="aspect-video bg-gray-200 rounded-t-lg overflow-hidden">
-                      <img
-                        src={thumbnailUrl}
-                        alt={article.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  )}
-                  <CardHeader>
-                    <CardTitle className="line-clamp-2">
-                      <Link
-                        to={`/articles/${article.slug}`}
-                        className="hover:text-blue-600 transition-colors"
-                      >
-                        {article.title}
-                      </Link>
-                    </CardTitle>
-                    <CardDescription className="line-clamp-3">
-                      {article.excerpt}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-1">
-                          <User className="h-4 w-4" />
-                          <span>{article.profiles?.full_name || article.profiles?.username}</span>
+          <>
+            <div className="mb-4 text-sm text-gray-600">
+              Showing {filteredArticles.length} of {articles.length} articles
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredArticles.map((article) => {
+                const thumbnailUrl = extractThumbnail(article.featured_image_url);
+                
+                return (
+                  <Card key={article.id} className="hover:shadow-lg transition-shadow group">
+                    {thumbnailUrl && (
+                      <div className="aspect-video bg-gray-200 rounded-t-lg overflow-hidden">
+                        <img
+                          src={thumbnailUrl}
+                          alt={article.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    <CardHeader>
+                      <CardTitle className="line-clamp-2">
+                        <Link
+                          to={`/articles/${article.slug}`}
+                          className="hover:text-blue-600 transition-colors"
+                        >
+                          {article.title}
+                        </Link>
+                      </CardTitle>
+                      <CardDescription className="line-clamp-3">
+                        {article.excerpt}
+                      </CardDescription>
+                      
+                      {/* Categories and Tags */}
+                      <div className="space-y-2">
+                        {article.categories.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {article.categories.map((category) => (
+                              <Badge
+                                key={category.id}
+                                variant="secondary"
+                                className="text-xs"
+                                style={{ backgroundColor: category.color + '20', color: category.color }}
+                              >
+                                {category.name}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {article.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {article.tags.map((tag) => (
+                              <Badge key={tag.id} variant="outline" className="text-xs">
+                                #{tag.name}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-1">
+                            <User className="h-4 w-4" />
+                            <span>{article.profiles?.full_name || article.profiles?.username}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Calendar className="h-4 w-4" />
+                            <span>{format(new Date(article.published_at), 'MMM d, yyyy')}</span>
+                          </div>
                         </div>
                         <div className="flex items-center space-x-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>{format(new Date(article.published_at), 'MMM d, yyyy')}</span>
+                          <Heart className="h-4 w-4" />
+                          <span>{article._count.likes}</span>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <Heart className="h-4 w-4" />
-                        <span>{article._count.likes}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
     </div>

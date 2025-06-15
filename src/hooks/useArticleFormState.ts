@@ -8,6 +8,8 @@ export function useArticleFormState() {
   const [excerpt, setExcerpt] = useState('');
   const [content, setContent] = useState('');
   const [featuredImageUrl, setFeaturedImageUrl] = useState('');
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('draft');
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(false);
@@ -27,6 +29,14 @@ export function useArticleFormState() {
     setContent(data.content);
     setFeaturedImageUrl(data.featured_image_url || '');
     setStatus(data.status);
+    
+    // Populate categories
+    const articleCategories = data.article_categories?.map((ac: any) => ac.categories?.id).filter(Boolean) || [];
+    setCategoryIds(articleCategories);
+    
+    // Populate tags
+    const articleTags = data.article_tags?.map((at: any) => at.tags?.name).filter(Boolean) || [];
+    setTags(articleTags);
   };
 
   const getFormData = () => ({
@@ -36,6 +46,8 @@ export function useArticleFormState() {
     content: content.trim(),
     featuredImageUrl,
     status,
+    categoryIds,
+    tags,
   });
 
   return {
@@ -45,6 +57,8 @@ export function useArticleFormState() {
     excerpt,
     content,
     featuredImageUrl,
+    categoryIds,
+    tags,
     status,
     loading,
     initialLoading,
@@ -53,6 +67,8 @@ export function useArticleFormState() {
     setExcerpt,
     setContent,
     setFeaturedImageUrl,
+    setCategoryIds,
+    setTags,
     setStatus,
     setLoading,
     setInitialLoading,

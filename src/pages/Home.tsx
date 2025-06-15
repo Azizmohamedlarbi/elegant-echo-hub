@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +19,17 @@ interface Article {
     full_name: string;
     username: string;
   };
+  categories: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    color: string;
+  }>;
+  tags: Array<{
+    id: string;
+    name: string;
+    slug: string;
+  }>;
   _count: {
     likes: number;
   };
@@ -45,6 +57,21 @@ export default function Home() {
           profiles (
             full_name,
             username
+          ),
+          article_categories (
+            categories (
+              id,
+              name,
+              slug,
+              color
+            )
+          ),
+          article_tags (
+            tags (
+              id,
+              name,
+              slug
+            )
           )
         `)
         .eq('status', 'published')
@@ -53,7 +80,7 @@ export default function Home() {
 
       if (error) throw error;
 
-      // Get likes count for each article
+      // Get likes count for each article and transform data
       const articlesWithLikes = await Promise.all(
         (data || []).map(async (article) => {
           const { count } = await supabase
@@ -63,6 +90,8 @@ export default function Home() {
 
           return {
             ...article,
+            categories: article.article_categories?.map(ac => ac.categories).filter(Boolean) || [],
+            tags: article.article_tags?.map(at => at.tags).filter(Boolean) || [],
             _count: { likes: count || 0 }
           };
         })
@@ -148,6 +177,39 @@ export default function Home() {
                       <CardDescription className="line-clamp-3">
                         {article.excerpt}
                       </CardDescription>
+                      
+                      {/* Categories and Tags */}
+                      <div className="space-y-2">
+                        {article.categories.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {article.categories.map((category) => (
+                              <Badge
+                                key={category.id}
+                                variant="secondary"
+                                className="text-xs"
+                                style={{ backgroundColor: category.color + '20', color: category.color }}
+                              >
+                                {category.name}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {article.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {article.tags.slice(0, 3).map((tag) => (
+                              <Badge key={tag.id} variant="outline" className="text-xs">
+                                #{tag.name}
+                              </Badge>
+                            ))}
+                            {article.tags.length > 3 && (
+                              <Badge variant="outline" className="text-xs text-gray-500">
+                                +{article.tags.length - 3} more
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-center justify-between text-sm text-gray-500">

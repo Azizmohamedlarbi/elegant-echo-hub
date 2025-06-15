@@ -12,6 +12,8 @@ interface ArticleFormCardProps {
   excerpt: string;
   content: string;
   featuredImageUrl: string;
+  categoryIds: string[];
+  tags: string[];
   status: 'draft' | 'published' | 'archived';
   loading: boolean;
   onTitleChange: (value: string) => void;
@@ -19,6 +21,8 @@ interface ArticleFormCardProps {
   onExcerptChange: (value: string) => void;
   onContentChange: (value: string) => void;
   onFeaturedImageUrlChange: (value: string) => void;
+  onCategoryIdsChange: (categoryIds: string[]) => void;
+  onTagsChange: (tags: string[]) => void;
   onStatusChange: (value: 'draft' | 'published' | 'archived') => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
@@ -31,6 +35,8 @@ export function ArticleFormCard({
   excerpt,
   content,
   featuredImageUrl,
+  categoryIds,
+  tags,
   status,
   loading,
   onTitleChange,
@@ -38,6 +44,8 @@ export function ArticleFormCard({
   onExcerptChange,
   onContentChange,
   onFeaturedImageUrlChange,
+  onCategoryIdsChange,
+  onTagsChange,
   onStatusChange,
   onSubmit,
   onCancel,
@@ -52,10 +60,14 @@ export function ArticleFormCard({
             slug={slug}
             excerpt={excerpt}
             featuredImageUrl={featuredImageUrl}
+            categoryIds={categoryIds}
+            tags={tags}
             onTitleChange={onTitleChange}
             onSlugChange={onSlugChange}
             onExcerptChange={onExcerptChange}
             onFeaturedImageUrlChange={onFeaturedImageUrlChange}
+            onCategoryIdsChange={onCategoryIdsChange}
+            onTagsChange={onTagsChange}
           />
 
           <ArticleContent
