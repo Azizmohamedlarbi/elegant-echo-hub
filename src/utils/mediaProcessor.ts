@@ -32,10 +32,16 @@ export const processMediaContent = (content: string): string => {
     '<div class="video-embed my-8 rounded-xl overflow-hidden shadow-xl bg-black"><div class="relative w-full" style="padding-bottom: 56.25%; height: 0;"><iframe class="absolute top-0 left-0 w-full h-full" src="https://drive.google.com/file/d/$1/preview" frameborder="0" allowfullscreen loading="lazy"></iframe></div></div>'
   );
 
-  // Google Drive image embedding - for images specifically
+  // Google Drive image embedding - Updated to use the same format as thumbnails
   processedContent = processedContent.replace(
     /https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view(?:\?usp=sharing)?(?!.*(?:mp4|avi|mov|wmv|flv|webm|mkv))/gi,
-    '<div class="image-embed my-8 flex justify-center"><img src="https://drive.google.com/uc?export=view&id=$1" alt="Article image" class="max-w-full h-auto rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300" loading="lazy" onerror="this.src=\'https://drive.google.com/uc?id=$1\'; this.onerror=null;" /></div>'
+    '<div class="image-embed my-8 flex justify-center"><img src="https://drive.google.com/uc?export=view&id=$1" alt="Article image" class="max-w-full h-auto rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300" loading="lazy" onerror="console.log(\'Primary Google Drive image failed, trying fallback\'); this.src=\'https://drive.google.com/thumbnail?id=$1&sz=w800-h600\'; this.onerror=function(){console.log(\'Fallback also failed\'); this.style.display=\'none\';};" /></div>'
+  );
+
+  // Also handle Google Drive open?id format for images
+  processedContent = processedContent.replace(
+    /https:\/\/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/gi,
+    '<div class="image-embed my-8 flex justify-center"><img src="https://drive.google.com/uc?export=view&id=$1" alt="Article image" class="max-w-full h-auto rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300" loading="lazy" onerror="console.log(\'Primary Google Drive image failed, trying fallback\'); this.src=\'https://drive.google.com/thumbnail?id=$1&sz=w800-h600\'; this.onerror=function(){console.log(\'Fallback also failed\'); this.style.display=\'none\';};" /></div>'
   );
 
   // Instagram post embedding
