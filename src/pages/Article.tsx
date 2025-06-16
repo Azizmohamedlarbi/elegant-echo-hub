@@ -161,7 +161,7 @@ export default function Article() {
     return <ArticleNotFound />;
   }
 
-  const canReadFullArticle = !article.is_premium || user;
+  const canReadFullArticle = !article.is_premium || !!user;
 
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
