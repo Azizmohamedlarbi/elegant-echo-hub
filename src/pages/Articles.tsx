@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -50,8 +49,8 @@ export default function Articles() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedTag, setSelectedTag] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedTag, setSelectedTag] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest');
   const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
@@ -156,14 +155,14 @@ export default function Articles() {
     }
 
     // Filter by category
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== 'all') {
       filtered = filtered.filter(article =>
         article.categories.some(cat => cat.id === selectedCategory)
       );
     }
 
     // Filter by tag
-    if (selectedTag) {
+    if (selectedTag && selectedTag !== 'all') {
       filtered = filtered.filter(article =>
         article.tags.some(tag => tag.name === selectedTag)
       );
@@ -187,12 +186,12 @@ export default function Articles() {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setSelectedCategory('');
-    setSelectedTag('');
+    setSelectedCategory('all');
+    setSelectedTag('all');
     setSortBy('newest');
   };
 
-  const hasActiveFilters = searchTerm || selectedCategory || selectedTag || sortBy !== 'newest';
+  const hasActiveFilters = searchTerm || selectedCategory !== 'all' || selectedTag !== 'all' || sortBy !== 'newest';
 
   if (loading) {
     return (
@@ -232,7 +231,7 @@ export default function Articles() {
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
@@ -246,7 +245,7 @@ export default function Articles() {
                   <SelectValue placeholder="All Tags" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Tags</SelectItem>
+                  <SelectItem value="all">All Tags</SelectItem>
                   {availableTags.map((tag) => (
                     <SelectItem key={tag} value={tag}>
                       {tag}
