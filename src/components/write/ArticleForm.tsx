@@ -16,6 +16,7 @@ export function ArticleForm({ articleId }: ArticleFormProps) {
     featuredImageUrl,
     categoryIds,
     tags,
+    isPremium,
     status,
     loading,
     initialLoading,
@@ -26,6 +27,7 @@ export function ArticleForm({ articleId }: ArticleFormProps) {
     setFeaturedImageUrl,
     setCategoryIds,
     setTags,
+    setIsPremium,
     setStatus,
     handleSubmit,
     handleCancel,
@@ -45,6 +47,7 @@ export function ArticleForm({ articleId }: ArticleFormProps) {
       featuredImageUrl={featuredImageUrl}
       categoryIds={categoryIds}
       tags={tags}
+      isPremium={isPremium}
       status={status}
       loading={loading}
       onTitleChange={handleTitleChange}
@@ -54,6 +57,7 @@ export function ArticleForm({ articleId }: ArticleFormProps) {
       onFeaturedImageUrlChange={setFeaturedImageUrl}
       onCategoryIdsChange={setCategoryIds}
       onTagsChange={setTags}
+      onIsPremiumChange={setIsPremium}
       onStatusChange={setStatus}
       onSubmit={handleSubmit}
       onCancel={handleCancel}

@@ -8,6 +8,7 @@ export interface ArticleData {
   excerpt: string;
   content: string;
   featuredImageUrl: string;
+  isPremium: boolean;
   status: 'draft' | 'published' | 'archived';
   categoryIds?: string[];
   tags?: string[];
@@ -48,6 +49,7 @@ export const createArticle = async (articleData: ArticleData, userId: string) =>
       excerpt: articleData.excerpt.trim() || null,
       content: articleData.content,
       featured_image_url: articleData.featuredImageUrl.trim() || null,
+      is_premium: articleData.isPremium,
       status: articleData.status,
       published_at: articleData.status === 'published' ? new Date().toISOString() : null,
       author_id: userId,
@@ -121,6 +123,7 @@ export const updateArticle = async (articleId: string, articleData: ArticleData,
       excerpt: articleData.excerpt.trim() || null,
       content: articleData.content,
       featured_image_url: articleData.featuredImageUrl.trim() || null,
+      is_premium: articleData.isPremium,
       status: articleData.status,
       published_at: articleData.status === 'published' ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),

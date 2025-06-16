@@ -10,6 +10,7 @@ export function useArticleFormState() {
   const [featuredImageUrl, setFeaturedImageUrl] = useState('');
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
+  const [isPremium, setIsPremium] = useState(false);
   const [status, setStatus] = useState<'draft' | 'published' | 'archived'>('draft');
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(false);
@@ -28,6 +29,7 @@ export function useArticleFormState() {
     setExcerpt(data.excerpt || '');
     setContent(data.content);
     setFeaturedImageUrl(data.featured_image_url || '');
+    setIsPremium(data.is_premium || false);
     setStatus(data.status);
     
     // Populate categories
@@ -45,6 +47,7 @@ export function useArticleFormState() {
     excerpt,
     content: content.trim(),
     featuredImageUrl,
+    isPremium,
     status,
     categoryIds,
     tags,
@@ -59,6 +62,7 @@ export function useArticleFormState() {
     featuredImageUrl,
     categoryIds,
     tags,
+    isPremium,
     status,
     loading,
     initialLoading,
@@ -69,6 +73,7 @@ export function useArticleFormState() {
     setFeaturedImageUrl,
     setCategoryIds,
     setTags,
+    setIsPremium,
     setStatus,
     setLoading,
     setInitialLoading,

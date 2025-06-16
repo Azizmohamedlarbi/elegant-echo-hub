@@ -14,6 +14,7 @@ interface ArticleFormCardProps {
   featuredImageUrl: string;
   categoryIds: string[];
   tags: string[];
+  isPremium: boolean;
   status: 'draft' | 'published' | 'archived';
   loading: boolean;
   onTitleChange: (value: string) => void;
@@ -23,6 +24,7 @@ interface ArticleFormCardProps {
   onFeaturedImageUrlChange: (value: string) => void;
   onCategoryIdsChange: (categoryIds: string[]) => void;
   onTagsChange: (tags: string[]) => void;
+  onIsPremiumChange: (isPremium: boolean) => void;
   onStatusChange: (value: 'draft' | 'published' | 'archived') => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
@@ -37,6 +39,7 @@ export function ArticleFormCard({
   featuredImageUrl,
   categoryIds,
   tags,
+  isPremium,
   status,
   loading,
   onTitleChange,
@@ -46,6 +49,7 @@ export function ArticleFormCard({
   onFeaturedImageUrlChange,
   onCategoryIdsChange,
   onTagsChange,
+  onIsPremiumChange,
   onStatusChange,
   onSubmit,
   onCancel,
@@ -62,12 +66,14 @@ export function ArticleFormCard({
             featuredImageUrl={featuredImageUrl}
             categoryIds={categoryIds}
             tags={tags}
+            isPremium={isPremium}
             onTitleChange={onTitleChange}
             onSlugChange={onSlugChange}
             onExcerptChange={onExcerptChange}
             onFeaturedImageUrlChange={onFeaturedImageUrlChange}
             onCategoryIdsChange={onCategoryIdsChange}
             onTagsChange={onTagsChange}
+            onIsPremiumChange={onIsPremiumChange}
           />
 
           <ArticleContent
