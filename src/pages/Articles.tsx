@@ -18,6 +18,7 @@ interface Article {
   slug: string;
   published_at: string;
   featured_image_url: string;
+  is_premium: boolean;
   profiles: {
     full_name: string;
     username: string;
@@ -76,6 +77,7 @@ export default function Articles() {
           slug,
           published_at,
           featured_image_url,
+          is_premium,
           profiles (
             full_name,
             username
@@ -311,14 +313,21 @@ export default function Articles() {
                       </div>
                     )}
                     <CardHeader className="p-4 sm:p-6">
-                      <CardTitle className="line-clamp-2 text-lg sm:text-xl">
-                        <Link
-                          to={`/articles/${article.slug}`}
-                          className="hover:text-blue-600 transition-colors"
-                        >
-                          {article.title}
-                        </Link>
-                      </CardTitle>
+                      <div className="flex items-start justify-between mb-2">
+                        <CardTitle className="line-clamp-2 text-lg sm:text-xl flex-1">
+                          <Link
+                            to={`/articles/${article.slug}`}
+                            className="hover:text-blue-600 transition-colors"
+                          >
+                            {article.title}
+                          </Link>
+                        </CardTitle>
+                        {article.is_premium && (
+                          <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 flex-shrink-0">
+                            Premium
+                          </span>
+                        )}
+                      </div>
                       <CardDescription className="line-clamp-3 text-sm">
                         {article.excerpt}
                       </CardDescription>

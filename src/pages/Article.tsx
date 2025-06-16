@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -10,6 +10,7 @@ import { ArticleHeader } from '@/components/article/ArticleHeader';
 import { ArticleLoading } from '@/components/article/ArticleLoading';
 import { ArticleNotFound } from '@/components/article/ArticleNotFound';
 import { ArticleContent } from '@/components/article/ArticleContent';
+import { PremiumPrompt } from '@/components/article/PremiumPrompt';
 
 interface Article {
   id: string;
@@ -18,6 +19,7 @@ interface Article {
   excerpt: string;
   published_at: string;
   featured_image_url: string;
+  is_premium: boolean;
   profiles: {
     full_name: string;
     username: string;
@@ -32,6 +34,7 @@ export default function Article() {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -57,6 +60,7 @@ export default function Article() {
           excerpt,
           published_at,
           featured_image_url,
+          is_premium,
           profiles (
             full_name,
             username
@@ -145,6 +149,10 @@ export default function Article() {
     }
   };
 
+  const handleSignUp = () => {
+    navigate('/auth');
+  };
+
   if (loading) {
     return <ArticleLoading />;
   }
@@ -153,12 +161,21 @@ export default function Article() {
     return <ArticleNotFound />;
   }
 
+  const canReadFullArticle = !article.is_premium || user;
+
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         <ArticleHeader />
-        <ArticleContent article={article} onLike={handleLike} />
-        <CommentSection articleId={article.id} />
+        <ArticleContent 
+          article={article} 
+          onLike={handleLike} 
+          showFullContent={canReadFullArticle}
+        />
+        {article.is_premium && !user && (
+          <PremiumPrompt onSignUp={handleSignUp} />
+        )}
+        {canReadFullArticle && <CommentSection articleId={article.id} />}
       </div>
     </div>
   );
