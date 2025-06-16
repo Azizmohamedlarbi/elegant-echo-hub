@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -195,17 +196,17 @@ export default function Articles() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-lg">Loading articles...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">All Articles</h1>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">All Articles</h1>
           
           {/* Search and Filters */}
           <div className="space-y-4">
@@ -220,74 +221,76 @@ export default function Articles() {
               />
             </div>
 
-            <div className="flex flex-wrap gap-4 items-center">
+            <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-gray-500" />
                 <span className="text-sm text-gray-600">Filters:</span>
               </div>
 
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              <Select value={selectedTag} onValueChange={setSelectedTag}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="All Tags" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Tags</SelectItem>
-                  {availableTags.map((tag) => (
-                    <SelectItem key={tag} value={tag}>
-                      {tag}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Select value={selectedTag} onValueChange={setSelectedTag}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All Tags" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tags</SelectItem>
+                    {availableTags.map((tag) => (
+                      <SelectItem key={tag} value={tag}>
+                        {tag}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-              <Select value={sortBy} onValueChange={(value: 'newest' | 'oldest' | 'popular') => setSortBy(value)}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                  <SelectItem value="oldest">Oldest First</SelectItem>
-                  <SelectItem value="popular">Most Popular</SelectItem>
-                </SelectContent>
-              </Select>
+                <Select value={sortBy} onValueChange={(value: 'newest' | 'oldest' | 'popular') => setSortBy(value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest First</SelectItem>
+                    <SelectItem value="oldest">Oldest First</SelectItem>
+                    <SelectItem value="popular">Most Popular</SelectItem>
+                  </SelectContent>
+                </Select>
 
-              {hasActiveFilters && (
-                <Button variant="outline" size="sm" onClick={clearFilters}>
-                  <X className="h-4 w-4 mr-1" />
-                  Clear Filters
-                </Button>
-              )}
+                {hasActiveFilters && (
+                  <Button variant="outline" size="sm" onClick={clearFilters} className="w-full sm:w-auto">
+                    <X className="h-4 w-4 mr-1" />
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         {filteredArticles.length === 0 ? (
-          <div className="text-center text-gray-600 py-12">
+          <div className="text-center text-gray-600 py-12 px-4">
             <p className="text-lg">
               {hasActiveFilters ? 'No articles found matching your criteria.' : 'No articles published yet.'}
             </p>
           </div>
         ) : (
           <>
-            <div className="mb-4 text-sm text-gray-600">
+            <div className="mb-4 text-sm text-gray-600 px-1">
               Showing {filteredArticles.length} of {articles.length} articles
             </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {filteredArticles.map((article) => {
                 const thumbnailUrl = extractThumbnail(article.featured_image_url);
                 
@@ -307,8 +310,8 @@ export default function Articles() {
                         />
                       </div>
                     )}
-                    <CardHeader>
-                      <CardTitle className="line-clamp-2">
+                    <CardHeader className="p-4 sm:p-6">
+                      <CardTitle className="line-clamp-2 text-lg sm:text-xl">
                         <Link
                           to={`/articles/${article.slug}`}
                           className="hover:text-blue-600 transition-colors"
@@ -316,7 +319,7 @@ export default function Articles() {
                           {article.title}
                         </Link>
                       </CardTitle>
-                      <CardDescription className="line-clamp-3">
+                      <CardDescription className="line-clamp-3 text-sm">
                         {article.excerpt}
                       </CardDescription>
                       
@@ -348,20 +351,20 @@ export default function Articles() {
                         )}
                       </div>
                     </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div className="flex items-center space-x-4">
+                    <CardContent className="p-4 sm:p-6 pt-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs sm:text-sm text-gray-500 gap-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0">
                           <div className="flex items-center space-x-1">
-                            <User className="h-4 w-4" />
-                            <span>{article.profiles?.full_name || article.profiles?.username}</span>
+                            <User className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="truncate">{article.profiles?.full_name || article.profiles?.username}</span>
                           </div>
                           <div className="flex items-center space-x-1">
-                            <Calendar className="h-4 w-4" />
+                            <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                             <span>{format(new Date(article.published_at), 'MMM d, yyyy')}</span>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <Heart className="h-4 w-4" />
+                        <div className="flex items-center space-x-1 self-end sm:self-auto">
+                          <Heart className="h-3 w-3 sm:h-4 sm:w-4" />
                           <span>{article._count.likes}</span>
                         </div>
                       </div>

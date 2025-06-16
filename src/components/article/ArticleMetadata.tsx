@@ -22,11 +22,11 @@ export function ArticleMetadata({
   onLike 
 }: ArticleMetadataProps) {
   return (
-    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-      <div className="flex items-center space-x-4">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-500 mb-3 sm:mb-4 gap-3 sm:gap-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
         <div className="flex items-center space-x-1">
           <User className="h-4 w-4" />
-          <span>{author?.full_name || author?.username}</span>
+          <span className="truncate">{author?.full_name || author?.username}</span>
         </div>
         <div className="flex items-center space-x-1">
           <Calendar className="h-4 w-4" />
@@ -38,7 +38,7 @@ export function ArticleMetadata({
         variant="outline"
         size="sm"
         onClick={onLike}
-        className={isLiked ? 'text-red-500 hover:text-red-600' : ''}
+        className={`${isLiked ? 'text-red-500 hover:text-red-600' : ''} self-start sm:self-auto`}
       >
         <Heart className={`h-4 w-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
         {likesCount}

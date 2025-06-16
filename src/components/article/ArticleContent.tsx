@@ -34,7 +34,7 @@ export function ArticleContent({ article, onLike }: ArticleContentProps) {
     
     return (
       <div 
-        className="mb-6"
+        className="mb-4 sm:mb-6"
         dangerouslySetInnerHTML={{ __html: processedMedia }}
       />
     );
@@ -42,11 +42,15 @@ export function ArticleContent({ article, onLike }: ArticleContentProps) {
 
   return (
     <Card className="shadow-lg">
-      <CardHeader>
-        <CardTitle className="text-3xl font-bold mb-4">{article.title}</CardTitle>
+      <CardHeader className="p-4 sm:p-6">
+        <CardTitle className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 leading-tight">
+          {article.title}
+        </CardTitle>
         
         {article.excerpt && (
-          <p className="text-lg text-gray-600 mb-4">{article.excerpt}</p>
+          <p className="text-base sm:text-lg text-gray-600 mb-3 sm:mb-4 leading-relaxed">
+            {article.excerpt}
+          </p>
         )}
         
         <ArticleMetadata
@@ -58,11 +62,11 @@ export function ArticleContent({ article, onLike }: ArticleContentProps) {
         />
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="p-4 sm:p-6">
         {renderFeaturedMedia()}
         
         <div 
-          className="prose prose-lg max-w-none"
+          className="prose prose-sm sm:prose-lg max-w-none prose-headings:leading-tight prose-p:leading-relaxed"
           dangerouslySetInnerHTML={{ 
             __html: processMediaContent(article.content) 
           }}
