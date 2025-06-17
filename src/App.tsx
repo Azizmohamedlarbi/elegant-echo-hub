@@ -12,6 +12,7 @@ import Article from "./pages/Article";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Write from "./pages/Write";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/write" element={<Write />} />
                 <Route path="/write/:id" element={<Write />} />
+                <Route path="/profile" element={<Profile />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

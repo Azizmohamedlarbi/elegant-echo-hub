@@ -2,7 +2,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { LogOut, User, PenTool } from 'lucide-react';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { LogOut, User, PenTool, Settings } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -13,6 +14,7 @@ import {
 
 export const Navbar = () => {
   const { user, signOut } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdminStatus();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -49,14 +51,23 @@ export const Navbar = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end">
-                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
-                    <User className="mr-2 h-4 w-4" />
-                    Dashboard
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/write')}>
-                    <PenTool className="mr-2 h-4 w-4" />
-                    Write Article
-                  </DropdownMenuItem>
+                  {!adminLoading && isAdmin ? (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                        <Settings className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/write')}>
+                        <PenTool className="mr-2 h-4 w-4" />
+                        Write Article
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <DropdownMenuItem onClick={() => navigate('/profile')}>
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
