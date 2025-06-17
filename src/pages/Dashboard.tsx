@@ -1,3 +1,4 @@
+
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +9,7 @@ import { ArticleManagement } from '@/components/admin/ArticleManagement';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { DashboardStats } from '@/components/admin/DashboardStats';
 import { AnalyticsOverview } from '@/components/admin/AnalyticsOverview';
+import { PageContentManagement } from '@/components/admin/PageContentManagement';
 import { Loader2 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -65,9 +67,9 @@ export default function Dashboard() {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
+            <CardTitle>Accès refusé</CardTitle>
             <CardDescription>
-              You don't have permission to access the admin dashboard.
+              Vous n'avez pas l'autorisation d'accéder au tableau de bord administrateur.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -79,16 +81,17 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-2">Manage your blog content and users</p>
+          <h1 className="text-3xl font-bold text-gray-900">Tableau de bord administrateur</h1>
+          <p className="text-gray-600 mt-2">Gérer le contenu de votre blog et les utilisateurs</p>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="overview">Aperçu</TabsTrigger>
             <TabsTrigger value="articles">Articles</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+            <TabsTrigger value="pages">Pages</TabsTrigger>
+            <TabsTrigger value="analytics">Analyses</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -101,6 +104,10 @@ export default function Dashboard() {
 
           <TabsContent value="users">
             <UserManagement />
+          </TabsContent>
+
+          <TabsContent value="pages">
+            <PageContentManagement />
           </TabsContent>
 
           <TabsContent value="analytics">

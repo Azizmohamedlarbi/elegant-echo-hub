@@ -27,15 +27,18 @@ export const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-2xl font-bold text-gray-900">
-            My Blog
+            Blog d'Aziz Mohamed Larbi Fillali
           </Link>
 
           <div className="flex items-center space-x-4">
             <Link to="/" className="text-gray-700 hover:text-gray-900">
-              Home
+              Accueil
             </Link>
             <Link to="/articles" className="text-gray-700 hover:text-gray-900">
               Articles
+            </Link>
+            <Link to="/about" className="text-gray-700 hover:text-gray-900">
+              À propos
             </Link>
             
             {user ? (
@@ -55,32 +58,32 @@ export const Navbar = () => {
                     <>
                       <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                         <Settings className="mr-2 h-4 w-4" />
-                        Dashboard
+                        Tableau de bord
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate('/write')}>
                         <PenTool className="mr-2 h-4 w-4" />
-                        Write Article
+                        Écrire un article
                       </DropdownMenuItem>
                     </>
                   ) : (
                     <DropdownMenuItem onClick={() => navigate('/profile')}>
                       <User className="mr-2 h-4 w-4" />
-                      Profile
+                      Profil
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
+                    Se déconnecter
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <div className="flex space-x-2">
                 <Button variant="ghost" onClick={() => navigate('/auth')}>
-                  Sign In
+                  Se connecter
                 </Button>
                 <Button onClick={() => navigate('/auth')}>
-                  Sign Up
+                  S'inscrire
                 </Button>
               </div>
             )}

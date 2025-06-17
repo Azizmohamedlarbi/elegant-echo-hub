@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Write from "./pages/Write";
 import Profile from "./pages/Profile";
+import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/articles" element={<Articles />} />
                 <Route path="/articles/:slug" element={<Article />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/write" element={<Write />} />

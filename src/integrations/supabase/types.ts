@@ -237,6 +237,33 @@ export type Database = {
           },
         ]
       }
+      page_content: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          page_key: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          page_key: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          page_key?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
