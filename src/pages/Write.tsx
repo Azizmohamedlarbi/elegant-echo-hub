@@ -16,8 +16,8 @@ export default function Write() {
 
   if (authLoading || adminLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin" />
       </div>
     );
   }
@@ -28,11 +28,11 @@ export default function Write() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-lg sm:text-xl">Access Denied</CardTitle>
+            <CardDescription className="text-sm sm:text-base">
               Only administrators can create and edit articles.
             </CardDescription>
           </CardHeader>
@@ -42,8 +42,8 @@ export default function Write() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <WriteHeader
           title={editMode ? "Edit Article" : "Write New Article"}
           description={editMode ? "Update your blog content" : "Create and publish your blog content"}

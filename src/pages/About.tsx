@@ -43,25 +43,25 @@ export default function About() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-3xl font-bold text-gray-900">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Card className="shadow-lg">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
               {pageContent?.title || 'À propos de moi'}
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="prose max-w-none">
+          <CardContent className="p-4 sm:p-6">
+            <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none">
               <div 
-                className="text-gray-700 leading-relaxed whitespace-pre-wrap"
+                className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
                 dangerouslySetInnerHTML={{ 
                   __html: pageContent?.content || 'Contenu non disponible.' 
                 }}

@@ -36,7 +36,7 @@ export function ArticleContent({ article, onLike, showFullContent = true }: Arti
     
     return (
       <div 
-        className="mb-4 sm:mb-6"
+        className="mb-4 sm:mb-6 overflow-hidden rounded-lg"
         dangerouslySetInnerHTML={{ __html: processedMedia }}
       />
     );
@@ -56,13 +56,13 @@ export function ArticleContent({ article, onLike, showFullContent = true }: Arti
   return (
     <Card className="shadow-lg">
       <CardHeader className="p-4 sm:p-6">
-        <div className="flex items-start justify-between mb-3 sm:mb-4">
-          <CardTitle className="text-2xl sm:text-3xl font-bold leading-tight flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 sm:mb-4 gap-3">
+          <CardTitle className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight flex-1 break-words">
             {article.title}
           </CardTitle>
           {article.is_premium && (
-            <div className="ml-4 flex-shrink-0">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            <div className="flex-shrink-0 self-start">
+              <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                 Premium
               </span>
             </div>
@@ -70,7 +70,7 @@ export function ArticleContent({ article, onLike, showFullContent = true }: Arti
         </div>
         
         {article.excerpt && (
-          <p className="text-base sm:text-lg text-gray-600 mb-3 sm:mb-4 leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-3 sm:mb-4 leading-relaxed break-words">
             {article.excerpt}
           </p>
         )}
@@ -89,7 +89,7 @@ export function ArticleContent({ article, onLike, showFullContent = true }: Arti
         
         <div className="relative">
           <div 
-            className={`prose prose-sm sm:prose-lg max-w-none prose-headings:leading-tight prose-p:leading-relaxed ${
+            className={`prose prose-sm sm:prose-base lg:prose-lg max-w-none prose-headings:leading-tight prose-p:leading-relaxed prose-img:rounded-lg prose-img:shadow-md break-words ${
               !showFullContent ? 'relative' : ''
             }`}
             dangerouslySetInnerHTML={{ 
@@ -97,7 +97,7 @@ export function ArticleContent({ article, onLike, showFullContent = true }: Arti
             }}
           />
           {!showFullContent && (
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
           )}
         </div>
       </CardContent>
