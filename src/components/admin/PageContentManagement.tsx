@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Save, Edit } from 'lucide-react';
+import { Save, Edit, RefreshCw, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface PageContent {
   id: string;
@@ -24,6 +25,7 @@ export const PageContentManagement = () => {
   const [editForm, setEditForm] = useState({ title: '', content: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -31,16 +33,35 @@ export const PageContentManagement = () => {
   }, []);
 
   const fetchPageContents = async () => {
+    console.log('Fetching page contents...');
+    setLoading(true);
+    setError(null);
+    
     try {
       const { data, error } = await supabase
         .from('page_content')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setPageContents(data || []);
-    } catch (error) {
+      console.log('Page contents response:', { data, error });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        console.log('No page contents found, creating default content...');
+        // Créer le contenu par défaut s'il n'existe pas
+        await createDefaultContent();
+        return;
+      }
+
+      setPageContents(data);
+      console.log('Page contents loaded:', data);
+    } catch (error: any) {
       console.error('Error fetching page contents:', error);
+      setError(error.message || 'Erreur lors du chargement des contenus');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les contenus de page',
@@ -51,7 +72,33 @@ export const PageContentManagement = () => {
     }
   };
 
+  const createDefaultContent = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('page_content')
+        .insert({
+          page_key: 'about-me',
+          title: 'À propos de moi',
+          content: 'Bienvenue sur mon blog ! Je suis Aziz Mohamed Larbi Fillali, passionné par l\'écriture et le partage de connaissances. Cette page peut être modifiée depuis le tableau de bord administrateur.'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setPageContents([data]);
+      toast({
+        title: 'Succès',
+        description: 'Contenu par défaut créé avec succès',
+      });
+    } catch (error: any) {
+      console.error('Error creating default content:', error);
+      setError(error.message || 'Erreur lors de la création du contenu par défaut');
+    }
+  };
+
   const startEditing = (pageContent: PageContent) => {
+    console.log('Starting to edit:', pageContent);
     setEditingId(pageContent.id);
     setEditForm({
       title: pageContent.title,
@@ -65,7 +112,9 @@ export const PageContentManagement = () => {
   };
 
   const savePageContent = async (id: string) => {
+    console.log('Saving page content:', { id, editForm });
     setSaving(true);
+    
     try {
       const { error } = await supabase
         .from('page_content')
@@ -86,7 +135,7 @@ export const PageContentManagement = () => {
         title: 'Succès',
         description: 'Contenu de page mis à jour avec succès',
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating page content:', error);
       toast({
         title: 'Erreur',
@@ -105,6 +154,62 @@ export const PageContentManagement = () => {
           <CardTitle>Gestion des Pages</CardTitle>
           <CardDescription>Chargement des contenus...</CardDescription>
         </CardHeader>
+        <CardContent className="flex items-center justify-center py-8">
+          <RefreshCw className="h-6 w-6 animate-spin mr-2" />
+          <span>Chargement en cours...</span>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Gestion des Pages</CardTitle>
+          <CardDescription>Une erreur s'est produite</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {error}
+            </AlertDescription>
+          </Alert>
+          <Button 
+            onClick={fetchPageContents} 
+            className="mt-4"
+            variant="outline"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Réessayer
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (pageContents.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Gestion des Pages</CardTitle>
+          <CardDescription>Aucun contenu trouvé</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Aucun contenu de page n'a été trouvé. Cliquez sur le bouton ci-dessous pour créer le contenu par défaut.
+            </AlertDescription>
+          </Alert>
+          <Button 
+            onClick={createDefaultContent} 
+            className="mt-4"
+          >
+            Créer le contenu par défaut
+          </Button>
+        </CardContent>
       </Card>
     );
   }
