@@ -26,19 +26,23 @@ export const Navbar = () => {
     <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="text-2xl font-bold text-gray-900">
-            Blog d'Aziz Mohamed Larbi Fillali
+          <Link to="/" className="text-lg sm:text-2xl font-bold text-gray-900">
+            <span className="hidden sm:inline">Blog d'Aziz Mohamed Larbi Fillali</span>
+            <span className="sm:hidden">Blog d'Aziz</span>
           </Link>
 
-          <div className="flex items-center space-x-4">
-            <Link to="/" className="text-gray-700 hover:text-gray-900">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <Link to="/" className="text-gray-700 hover:text-gray-900 text-sm sm:text-base">
               Accueil
             </Link>
-            <Link to="/articles" className="text-gray-700 hover:text-gray-900">
+            <Link to="/articles" className="text-gray-700 hover:text-gray-900 text-sm sm:text-base">
               Articles
             </Link>
-            <Link to="/about" className="text-gray-700 hover:text-gray-900">
+            <Link to="/about" className="text-gray-700 hover:text-gray-900 text-sm sm:text-base hidden xs:inline">
               À propos
+            </Link>
+            <Link to="/about" className="text-gray-700 hover:text-gray-900 text-sm sm:text-base xs:hidden">
+              About
             </Link>
             
             {user ? (
@@ -78,11 +82,11 @@ export const Navbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex space-x-2">
-                <Button variant="ghost" onClick={() => navigate('/auth')}>
+              <div className="flex space-x-1 sm:space-x-2">
+                <Button variant="ghost" onClick={() => navigate('/auth')} className="text-xs sm:text-sm px-2 sm:px-4">
                   Se connecter
                 </Button>
-                <Button onClick={() => navigate('/auth')}>
+                <Button onClick={() => navigate('/auth')} className="text-xs sm:text-sm px-2 sm:px-4">
                   S'inscrire
                 </Button>
               </div>
