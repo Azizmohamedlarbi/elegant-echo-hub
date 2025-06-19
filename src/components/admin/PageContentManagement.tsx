@@ -52,7 +52,6 @@ export const PageContentManagement = () => {
 
       if (!data || data.length === 0) {
         console.log('No page contents found, creating default content...');
-        // Créer le contenu par défaut s'il n'existe pas
         await createDefaultContent();
         return;
       }
@@ -74,6 +73,7 @@ export const PageContentManagement = () => {
 
   const createDefaultContent = async () => {
     try {
+      console.log('Creating default content...');
       const { data, error } = await supabase
         .from('page_content')
         .insert({
@@ -84,7 +84,12 @@ export const PageContentManagement = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      console.log('Default content creation response:', { data, error });
+
+      if (error) {
+        console.error('Error creating default content:', error);
+        throw error;
+      }
 
       setPageContents([data]);
       toast({
@@ -94,6 +99,11 @@ export const PageContentManagement = () => {
     } catch (error: any) {
       console.error('Error creating default content:', error);
       setError(error.message || 'Erreur lors de la création du contenu par défaut');
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de créer le contenu par défaut. Vérifiez vos permissions d\'administrateur.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -125,7 +135,12 @@ export const PageContentManagement = () => {
         })
         .eq('id', id);
 
-      if (error) throw error;
+      console.log('Save response:', { error });
+
+      if (error) {
+        console.error('Error saving content:', error);
+        throw error;
+      }
 
       await fetchPageContents();
       setEditingId(null);
@@ -139,7 +154,7 @@ export const PageContentManagement = () => {
       console.error('Error updating page content:', error);
       toast({
         title: 'Erreur',
-        description: 'Impossible de mettre à jour le contenu',
+        description: 'Impossible de mettre à jour le contenu. Vérifiez vos permissions d\'administrateur.',
         variant: 'destructive',
       });
     } finally {
