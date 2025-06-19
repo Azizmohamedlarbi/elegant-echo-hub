@@ -101,7 +101,7 @@ export const PageContentManagement = () => {
       setError(error.message || 'Erreur lors de la création du contenu par défaut');
       toast({
         title: 'Erreur',
-        description: 'Impossible de créer le contenu par défaut. Vérifiez vos permissions d\'administrateur.',
+        description: 'Impossible de créer le contenu par défaut. Assurez-vous d\'avoir les permissions d\'administrateur.',
         variant: 'destructive',
       });
     }
@@ -154,7 +154,7 @@ export const PageContentManagement = () => {
       console.error('Error updating page content:', error);
       toast({
         title: 'Erreur',
-        description: 'Impossible de mettre à jour le contenu. Vérifiez vos permissions d\'administrateur.',
+        description: 'Impossible de mettre à jour le contenu. Assurez-vous d\'avoir les permissions d\'administrateur.',
         variant: 'destructive',
       });
     } finally {
